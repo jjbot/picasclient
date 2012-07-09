@@ -4,6 +4,8 @@ Created on Mon Jun  4 11:40:06 2012
 
 @author: Jan Bot
 """
+# Python imports
+import random
 
 # CouchDB imports
 import couchdb
@@ -36,19 +38,22 @@ class CouchClient(object):
         view = self.db.view(viewLoc)
         return view.rows
         
-    def get_token(self, viewLoc, view_params={}):
+    def get_token(self, viewLoc, view_params={}, window_size=1):
         """Get a token from the specified view.
-        @param view: the view to get the token from.
-        @param view_params: the parameters that should be added to the view
-        request.
-        @return: a CouchDB token.
+        :param view: the view to get the token from.
+        :param view_params: the parameters that should be added to the view
+        request. Optional.
+        :param window_size: the size of the initial request to CouchDB, only
+        one record within that set, which is randomly selected, is returned.
+        :return: a CouchDB token.
         """
-        view = self.db.view(viewLoc, limit=1, **view_params)
-        try:
-            row = view.rows[0]
-            return (row['key'], row['value'])
-        except IndexError:
+        view = self.db.view(viewLoc, limit=window_size, **view_params)
+        l = len(view.rows)
+        if l == 0:
             raise IndexError("None available.")
+        i = random.randint(0, l-1)
+        row = view.rows[i]
+        return (row['key'], row['value'])
     
     def modify_token(self, token):
         """Modify a token.

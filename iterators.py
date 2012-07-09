@@ -58,13 +58,15 @@ class BasicViewIterator(ViewIterator):
         while count < allowed_failures:
             count += 1
             try:
-                (key, token_id) = self.client.get_token(self.view, 
-                        self.view_params)
-                token = self.client.db[token_id]
-                modified_token = self.token_modifier.lock(key, token)
+                (key, ref) = self.client.get_token(self.view, 
+                        view_params=self.view_params, window_size=100)
+                token = self.client.db[ref[0]]
+                modified_token = self.token_modifier.lock(ref, token)
                 return (key, self.client.modify_token(modified_token) )
             except ResourceConflict:
-                pass      
+                pass
+        if count == allowed_failures:
+            raise EnvironmentError("Unable to claim token.")
 
 
 class MultiKeyViewIterator(ViewIterator):

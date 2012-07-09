@@ -6,6 +6,8 @@ Created on Mon May 21 16:13:58 2012
 """
 
 class TokenGenerator(object):
+    """Object to generate the standard tokens with.
+    """
     def __init__(self):
         pass
 

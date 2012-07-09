@@ -2,12 +2,15 @@
 
 .. moduleauthor:: Jan Bot <janjbot@gmail.com>
 
+A module to work through large amounts of jobs on heterogeneous compute
+infrastructure. Relies on a CouchDB server to keep track of the work itself.
+
 """
 
 import logging
 from logging import StreamHandler
 
-version = 0.30
+version = 0.50
 
 picaslogger = logging.getLogger("PiCaS")
 formatter = logging.Formatter(

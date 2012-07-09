@@ -15,6 +15,8 @@ import time
 from couchdb import Server
 
 class CouchDBLogger(logging.Handler):
+    """Logger class which writes messages to CouchDB in a predefined format.
+    """
     def __init__(self, url, db):
         logging.Handler.__init__(self)
         self.server = Server(url=url)

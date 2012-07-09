@@ -5,6 +5,9 @@ Created on Mon Jun  4 11:46:25 2012
 @author: Jan Bot
 """
 
+import sys
+import time
+
 class RunActor(object):
     """Executor class to be overwritten in the client implementation.
     """
@@ -16,15 +19,20 @@ class RunActor(object):
         self.client = iterator.client
         self.modifier = modifier
     
-    def run(self):
+    def run(self, maxtime=-1):
         """Run method of the actor, executes the application code by iterating
         over the available tokens in CouchDB.
         """
+        start = time.time()
         self.prepare_env()
-        for key, token in self.iterator:
+        for key, token in self.iterator:            
             self.prepare_run()
             self.process_token(key, token)
             self.cleanup_run
+            if maxtime > 0:
+                now = time.time()
+                if now - start > maxtime:
+                    sys.exit(0)
         self.cleanup_env()
         
     def prepare_env(self, *kargs, **kwargs):

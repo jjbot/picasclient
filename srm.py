@@ -63,7 +63,7 @@ class Downloader(threading.Thread):
                 except:
                     count += 1
             if(count > 9):
-                picasclient.logger.error("Download of " + f + 
+                self.logger.error("Download of " + f + 
                         " failed after multiple tries.")
                 raise EnvironmentError("Download failed.")
             self.q.task_done()
@@ -134,12 +134,23 @@ class SRMClient(object):
         
         cmd = ['srmcp', '-2', '-server_mode=passive', 
                srm_url, 'file:///' + local_file]
-        picasclient.logger.info("Downloading: " + local_file)
+        self.logger.info("Downloading: " + local_file)
         returncode = execute_old(" ".join(cmd))
-        picasclient.logger.debug("Done downloading " + local_file)
+        self.logger.debug("Done downloading " + local_file)
         if returncode == 0:
             pass
         else:
-            picasclient.logger.error("Download failed of: " + srm_file)
+            self.logger.error("Download failed of: " + srm_file)
             raise EnvironmentError("Download failed.")
         return local_file
+    
+    def remove(self, srm_file):
+        srm_url = self.srm_host + srm_file
+        cmd = ['srmrm', srm_url]
+        returncode = execute_old(" ".join(cmd))
+        if returncode == 0:
+            pass
+        else:
+            self.logger.error("Removal failed of: " + srm_file)
+            raise EnvironmentError("Remove failed.")
+        return True

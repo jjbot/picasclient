@@ -112,47 +112,68 @@ class BasicTokenModifier(TokenModifier):
 
 
 class NestedTokenModifier(TokenModifier):
-    def __init__(self, token_key, timeout=86400):
-        self.token_key = token_key
+    def __init__(self, timeout=86400):
         self.timeout = timeout
     
-    def _get_token(self, record):
-        return record[self.token_key]
+    def _get_token_from_list(self, ref, record):
+        token = record
+        for k in ref[1:]:
+            token = token[k]
+        return token
+
+    def _get_token_from_value(self, ref, record):
+        return record[ref]
     
-    def _update_record(self, record, token):
-        record[self.token_key] = token
+    def _get_token(self, ref, record):
+        if(type(ref) == list):
+            return self._get_token_from_list(ref, record)
+        else:
+            return self._get_token_from_value(ref, record)
+    
+    def get_token(self, ref, record):
+        return self._get_token(ref, record)
+    
+    def _update_record(self, ref, record, token):
+        r = record
+        if(type(ref)) == list:
+            for k in ref[1:len(ref) -1]:
+                r = r[k]
+            r[ref[-1]] = token
+        else:
+            record[ref] = token
         return record
         
-    def lock(self, key, record):
-        token = self._get_token(record)
+    def lock(self, ref, record):
+        token = self._get_token(ref, record)
         token['lock'] = int(time.time())
         token['hostname'] = socket.gethostname()
-        return self._update_record(record, token)
+        return self._update_record(ref, record, token)
     
-    def unlock(self, key, record):
-        token = self._get_token(record)
+    def unlock(self, ref, record):
+        token = self._get_token(ref, record)
         token['lock'] = 0
-        return self._update_record(record, token)
+        return self._update_record(ref, record, token)
     
-    def close(self, key, record):
-        token = self._get_token(record)
+    def close(self, ref, record):
+        token = self._get_token(ref, record)
         token['done'] = int(time.time())
-        return self._update_record(record, token)
+        return self._update_record(ref, record, token)
     
-    def unclose(self, key, record):
-        token = self._get_token(record)
+    def unclose(self, ref, record):
+        token = self._get_token(ref, record)
         token['lock'] = 0
         token['done'] = 0
-        return self._update_record(record, token)
+        return self._update_record(ref, record, token)
     
-    def add_output(self,key, record, output):
-        token = self._get_token(record)
+    def add_output(self, ref, record, output):
+        token = self._get_token(ref, record)
         token['output'].update(output)
-        return self._update_record(record, token)
+        return self._update_record(ref, record, token)
     
-    def scrub(self, key, record):
-        token = self._get_token(record)
+    def scrub(self, ref, record):
+        token = self._get_token(ref, record)
+        token['hostname'] = ""
         token['lock'] = 0
         token['done'] = 0
         token['scrub_count'] += 1
-        return self._update_record(record, token)
+        return self._update_record(ref, record, token)
