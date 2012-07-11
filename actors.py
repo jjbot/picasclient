@@ -25,10 +25,10 @@ class RunActor(object):
         """
         start = time.time()
         self.prepare_env()
-        for key, token in self.iterator:            
+        for key, ref, token in self.iterator:            
             self.prepare_run()
-            self.process_token(key, token)
-            self.cleanup_run
+            self.process_token(ref, token)
+            self.cleanup_run()
             if maxtime > 0:
                 now = time.time()
                 if now - start > maxtime:
