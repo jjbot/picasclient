@@ -13,23 +13,26 @@ class TokenModifier(object):
     def __init__(self, timeout=86400):
         self.timeout = timeout
     
-    def lock(self, key, token):
+    def lock(self, *args):
         raise NotImplementedError("Lock function not implemented.")
     
-    def unlock(self, key, token):
+    def unlock(self, *args):
         raise NotImplementedError("Unlock functin not implemented.")
     
-    def close(self, key, token):
+    def close(self, *args):
         raise NotImplementedError("Close function not implemented.")
     
-    def unclose(self, key, token):
+    def unclose(self, *args):
         raise NotImplementedError("Unclose function not implemented.")
     
-    def add_output(self,key, token, output):
+    def add_output(self, *args):
         raise NotImplementedError("Add_output function not implemented.")
     
-    def scrub(self, key, token):
+    def scrub(self, *args):
         raise NotImplementedError("Scrub function not implemented.")
+    
+    def set_error(self, *args):
+        raise NotImplementedError("set_error function not implemented.")
 
 
 class BasicTokenModifier(TokenModifier):
@@ -72,7 +75,7 @@ class BasicTokenModifier(TokenModifier):
         @return: modified token.
         """
         done_content = {
-            'done': True
+            'done': int(time.time())
         }
         token.update(done_content)
         return token
@@ -84,7 +87,7 @@ class BasicTokenModifier(TokenModifier):
         @return: modified token.
         """
         done_content = {
-            'done': False
+            'done': 0
         }
         token.update(done_content)
         return token
@@ -108,6 +111,11 @@ class BasicTokenModifier(TokenModifier):
         if not token.has_key('scrub_count'):
             token['scrub_count'] = 0
         token['scrub_count'] += 1
+        return token
+    
+    def set_error(self, token):
+        token['lock'] = -1
+        token['done'] = -1
         return token
 
 
@@ -176,4 +184,10 @@ class NestedTokenModifier(TokenModifier):
         token['lock'] = 0
         token['done'] = 0
         token['scrub_count'] += 1
+        return self._update_record(ref, record, token)
+    
+    def set_error(self, ref, record):
+        token = self._get_token(ref, record)
+        token['lock'] = -1
+        token['done'] = -1
         return self._update_record(ref, record, token)

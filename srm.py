@@ -26,7 +26,7 @@ def upload(localfile, srm_dir):
 
 def download_many(files, poolsize=10):
     q = Queue.Queue()
-    for k, v in files.iteritems():
+    for v in files:
         q.put(v)
     
     thread_pool = []
