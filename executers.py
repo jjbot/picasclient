@@ -15,8 +15,8 @@ def execute(args, shell=False):
     @return: a tuple containing the exitcode, stdout & stderr
     """
     proc = Popen(args, stdout=PIPE, stderr=PIPE, shell=shell)
-    proc.wait()
-    return (proc.returncode, proc.stdout.read(), proc.stderr.read())
+    (stdout, stderr) = proc.communicate()
+    return (proc.returncode, stdout, stderr)
 
 def execute_old(cmd):
     """Helper functino to execute an external application.

@@ -13,25 +13,25 @@ class TokenModifier(object):
     def __init__(self, timeout=86400):
         self.timeout = timeout
     
-    def lock(self, *args):
+    def lock(self, *args, **kwargs):
         raise NotImplementedError("Lock function not implemented.")
     
-    def unlock(self, *args):
+    def unlock(self, *args, **kwargs):
         raise NotImplementedError("Unlock functin not implemented.")
     
-    def close(self, *args):
+    def close(self, *args, **kwargs):
         raise NotImplementedError("Close function not implemented.")
     
-    def unclose(self, *args):
+    def unclose(self, *args, **kwargs):
         raise NotImplementedError("Unclose function not implemented.")
     
-    def add_output(self, *args):
+    def add_output(self, *args, **kwargs):
         raise NotImplementedError("Add_output function not implemented.")
     
-    def scrub(self, *args):
+    def scrub(self, *args, **kwargs):
         raise NotImplementedError("Scrub function not implemented.")
     
-    def set_error(self, *args):
+    def set_error(self, *args, **kwargs):
         raise NotImplementedError("set_error function not implemented.")
 
 

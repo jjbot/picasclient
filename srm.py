@@ -24,14 +24,14 @@ def upload(localfile, srm_dir):
     picasclient.logging.debug("Uploading: " + localfile)
     pass
 
-def download_many(files, poolsize=10):
+def download_many(files, poolsize=10, logger=None):
     q = Queue.Queue()
     for v in files:
         q.put(v)
     
     thread_pool = []
     for i in range(poolsize):
-        d = Downloader(q)
+        d = Downloader(q, logger)
         d.start()
         thread_pool.append(d)
     
@@ -44,10 +44,13 @@ def upload_many(files, poolsize=10):
     
     
 class Downloader(threading.Thread):
-    def __init__(self, queue):
+    def __init__(self, queue, logger=None):
         threading.Thread.__init__(self)
         self.q = queue
-        self.logger = logging.getLogger('Pindel')
+        if logger == None:
+            self.logger = logging.getLogger('SRM')
+        else:
+            self.logger = logger
         self.srm = SRMClient(self.logger)
         self.daemon = False
     
@@ -56,17 +59,19 @@ class Downloader(threading.Thread):
             f = self.q.get()
             count = 0
             done = False
-            while(count < 10 and not done):
+            while(count < 25 and not done):
                 try:
                     self.srm.download(f)
                     done = True
                 except:
                     count += 1
-            if(count > 9):
+            
+            self.q.task_done()            
+
+            if(count > 24):
                 self.logger.error("Download of " + f + 
                         " failed after multiple tries.")
-                raise EnvironmentError("Download failed.")
-            self.q.task_done()
+                raise EnvironmentError("Download failed of: " + f)            
 
 
 class SRMClient(object):

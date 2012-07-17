@@ -35,16 +35,19 @@ class CouchDBLogger(logging.Handler):
             'trance_nr': self.trace_nr,
             'type': 'log'
         }
-        id = self.hostname + ":" + str(int(time.time())) 
         
         count = 0
         done = False
         while(count < 10 and not done):
             try:
+                id = self.hostname + ":" + str(int(time.time())) 
                 self.db[id] = log_dict
                 done = True
-            except:
+            except Exception as e:
+                print e
+                print log_dict
                 count += 1
+                time.sleep(0.5)
 
 default_log_formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
