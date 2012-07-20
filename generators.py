@@ -14,8 +14,6 @@ class TokenGenerator(object):
     @staticmethod
     def get_empty_token():
         token = {
-                'input': {},
-                'output': {},
                 'lock': 0,
                 'done': 0,
                 'hostname': '',

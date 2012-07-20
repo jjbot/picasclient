@@ -38,8 +38,8 @@ class TokenModifier(object):
 class BasicTokenModifier(TokenModifier):
     """Class to manage token modifications with.
     """
-    def __init__(self, timeout=86400):
-        self.timeout = timeout        
+    def __init__(self):
+        pass
     
     def lock(self, token):
         """Function which modifies the token such that it is locked.
@@ -49,7 +49,7 @@ class BasicTokenModifier(TokenModifier):
         """
         lock_content = {
             'hostname': socket.gethostname(),
-            'lock': int(time.time() ) + self.timeout
+            'lock': int( time.time() )
         }
         token.update(lock_content)
         return token
