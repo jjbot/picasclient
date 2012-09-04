@@ -60,7 +60,10 @@ class BasicViewIterator(ViewIterator):
             try:
                 (key, ref) = self.client.get_token(self.view, 
                         view_params=self.view_params, window_size=100)
-                record = self.client.db[ref[0]]
+                document_index = ref
+                if type(ref) == list:
+                    document_index = ref[0]
+                record = self.client.db[document_index]
                 modified_record = self.token_modifier.lock(ref, record)
                 return (key, ref, self.client.modify_token(modified_record) )
             except ResourceConflict:
