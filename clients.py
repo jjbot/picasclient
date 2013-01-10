@@ -18,8 +18,8 @@ class CouchClient(object):
             username="", password=""):
         """Create a CouchClient object. 
         :param url: the location where the CouchDB instance is located, 
-        including the port at which it's listening.
-        :param db: the database to use.
+        including the port at which it's listening. Default: http://localhost:5984
+        :param db: the database to use. Default: test.
         """
         self.server = Server(url=url)
         if username == "":            
@@ -57,8 +57,8 @@ class CouchClient(object):
     
     def modify_token(self, token):
         """Modify a token.
-        @param token: the token to be modified.
-        @return: the modified token (including new _rev).
+        :param token: the token to be modified.
+        :return: the modified token (including new _rev).
         """
         self.db[token['_id']] = token
         return token

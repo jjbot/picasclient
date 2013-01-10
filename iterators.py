@@ -12,6 +12,8 @@ import random
 from couchdb import ResourceConflict
 
 class ViewIterator(object):
+    """Dummy class to show what to implement for a PICaS iterator.
+    """
     def __init__(self, client, view, token_modifier, view_params={}):
         pass
     

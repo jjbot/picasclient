@@ -3,6 +3,7 @@
 Created on Tue Jun  5 14:02:36 2012
 
 @author: Jan Bot
+Module to easily execute commandline applications.
 """
 
 # Python imports

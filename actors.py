@@ -48,6 +48,12 @@ class RunActor(object):
         raise NotImplementedError
     
     def process_token(self, key, token):
+        """The function to overwrite which processes the tokens themselves.
+        @param key: the token key. Should not be used to hold anything
+        informative as it is mainly used to determine the order in which the
+        tokens are returned.
+        @param token: the token itself. !WARNING
+        """
         modification = ()
         for k, v in token.iteritems():
             print k, v

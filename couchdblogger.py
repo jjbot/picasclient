@@ -15,9 +15,15 @@ import time
 from couchdb import Server
 
 class CouchDBLogger(logging.Handler):
-    """Logger class which writes messages to CouchDB in a predefined format.
+    """Logger class which writes messages to CouchDB in a predefined 
+    format.
     """
     def __init__(self, url, db):
+        """Initiation function.
+        :param url: the url including the port on which the database 
+        is located.
+        :param db: the name of the database.
+        """
         logging.Handler.__init__(self)
         self.server = Server(url=url)
         self.db = self.server[db]
@@ -26,6 +32,10 @@ class CouchDBLogger(logging.Handler):
         self.trace_nr = int(random.random() * 100000)
     
     def emit(self, record):
+        """Function used by the Python logging framework to output messages.
+        Internal only.
+        :param record: a log-record to process.
+        """
         log_dict = {
             'lvl': record.levelno,
             'msg': record.msg,

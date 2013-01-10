@@ -2,7 +2,7 @@
 """
 Created on Sun May 20 18:16:41 2012
 
-@author: Jan Bot, Leiden University & Delft University of Technology
+@author: Jan Bot, Leiden University, Delft University of Technology, SURFsara
 """
 
 # Python imports
@@ -18,13 +18,19 @@ from picasclient.executers import execute, execute_old
 
 def download(remotefile, local_dir):
     picasclient.logging.debug("Downloading: " + remotefile)
-    pass
+    raise NotImplementedError("Download function not implemented yet. Use SRMClient class.")
 
 def upload(localfile, srm_dir):
     picasclient.logging.debug("Uploading: " + localfile)
-    pass
+    raise NotImplementedError("Upload function not implemented yet. Use SRMClient class.")
 
 def download_many(files, poolsize=10, logger=None):
+    """Download a number of files in parallel.
+    @param files: an array with the locations of the files to fetch.
+    @param poolsize: the number of concurrent connections that need to
+    be established. Default: 10.
+    @param logger: a Python logger object. Default: None.
+    """
     q = Queue.Queue()
     for v in files:
         q.put(v)
@@ -40,11 +46,20 @@ def download_many(files, poolsize=10, logger=None):
         d.join(1)
         
 def upload_many(files, poolsize=10):
-    pass
+    raise NotImplementedError("upload_many function not implemented. Use SRMClient class.")
     
     
 class Downloader(threading.Thread):
+    """Threaded SRM download class. Facilitates many simultaneous 
+    connections to the SRM. Use with care: you can easily flood the
+    SRM with too many request.
+    """
     def __init__(self, queue, logger=None):
+        """Initialization.
+        @param queue: Python queue object containing all the files that need
+        to be downloaded.
+        @param logger: Python logger object.
+        """
         threading.Thread.__init__(self)
         self.q = queue
         if logger == None:
@@ -55,6 +70,9 @@ class Downloader(threading.Thread):
         self.daemon = False
     
     def run(self):
+        """Start the download worker. Starts downloading the first file 
+        in the queue.
+        """
         while not self.q.empty():
             f = self.q.get()
             count = 0
@@ -75,13 +93,20 @@ class Downloader(threading.Thread):
 
 
 class SRMClient(object):
+    """Helper class to easily down- and upload files to/from SRM.
+    """
     def __init__(self, logger, host="srm://srm.grid.sara.nl/"):
+        """Init function.
+        @param logger: Python logger.
+        @param host: host address of the SRM. Default: srm://srm.grid.sara.nl/"
+        """
         self.logger = logger
         self.srm_host = host
 
     def remote_exists(self, loc):
         """Check if a file exists on the remote location.
         @param loc: complete path on the SRM to the file.
+        @return: True when the 
         """
         sURL = self.srm_host + loc
         cmd = ['srmls', sURL]
@@ -150,6 +175,11 @@ class SRMClient(object):
         return local_file
     
     def remove(self, srm_file):
+        """Remove a file from the SRM.
+        @param srm_file: Path to the file on the SRM.
+        @return: True when the operation succeeded. Throws an environment
+        error otherwise.
+        """
         srm_url = self.srm_host + srm_file
         cmd = ['srmrm', srm_url]
         returncode = execute_old(" ".join(cmd))
