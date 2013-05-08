@@ -66,7 +66,7 @@ class BasicViewIterator(ViewIterator):
                 if type(ref) == list:
                     document_index = ref[0]
                 record = self.client.db[document_index]
-                modified_record = self.token_modifier.lock(ref, record)
+                modified_record = self.token_modifier.lock(record)
                 return (key, ref, self.client.modify_token(modified_record) )
             except ResourceConflict:
                 pass
@@ -95,9 +95,13 @@ class MultiKeyViewIterator(ViewIterator):
         count = 0
         while count < allowed_failures:
             try:
-                (key, token) = self.client.get_token(self.view, 
+                (key, ref) = self.client.get_token(self.view, 
                         self.view_params)
-                modified_token = self.token_modifier.lock(key, token)
+                record = ref
+                if type(ref) == list:
+                    document_index = ref[0]
+                    record = self.client.db[document_index]
+                modified_token = self.token_modifier.lock(record)
                 return (key, self.client.modify_token(modified_token) )
             except ResourceConflict:
                 pass
