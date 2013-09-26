@@ -39,19 +39,21 @@ class RunActor(object):
         """Method to be called to prepare the environment to run the 
         application.
         """
-        raise NotImplementedError
+        pass
     
     def prepare_run(self, *kargs, **kwargs):
         """Code to run before a token gets processed. Used e.g. for fetching
         inputs.
         """
-        raise NotImplementedError
+        pass
     
     def process_token(self, key, token):
         """The function to overwrite which processes the tokens themselves.
         @param key: the token key. Should not be used to hold anything
         informative as it is mainly used to determine the order in which the
         tokens are returned.
+        @param key: the key indicating where the token is stored in the 
+        database.
         @param token: the token itself. !WARNING
         """
         modification = ()
@@ -63,12 +65,12 @@ class RunActor(object):
     def cleanup_run(self, *kargs, **kwargs):
         """Code to run after a token has been processed.
         """
-        raise NotImplementedError
+        pass
     
     def cleanup_env(self, *kargs, **kwargs):
         """Method which gets called after the run method has completed.
         """
-        raise NotImplementedError
+        pass
     
     def unlock_all(self, view):
         rows = self.client.get_all(view)
