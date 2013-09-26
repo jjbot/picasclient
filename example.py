@@ -29,7 +29,6 @@ class ExampleActor(RunActor):
         
         token = self.modifier.close(token)
         self.db[ref[0]] = token
-        aslkdfjalj
 
 
     def cleanup_run(self, *kargs, **kvargs):
