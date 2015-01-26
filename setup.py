@@ -9,5 +9,5 @@ setup(name='picas',
       author_email='jan.bot@surfsara.nl',
       url='https://github.org/jjbot/picasclient/',
       packages=['picas'],
-      requires=['couchdb (==1.0)']
+      install_requires=['couchdb']
      )
