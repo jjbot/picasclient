@@ -8,7 +8,7 @@ Created on Mon May 21 16:15:25 2012
 # Python imports
 import random
 
-# CouchDB immports
+# CouchDB imports
 from couchdb import ResourceConflict
 
 class ViewIterator(object):
@@ -33,6 +33,14 @@ class ViewIterator(object):
         except IndexError:
             raise StopIteration
         raise StopIteration
+    
+    def claim_token(self, allowed_failures=10):
+        """
+        Get the first available token from a view.
+        @param allowed_failures: the number of times a lock failure may
+        occur before giving up. Default=10.
+        """
+        raise NotImplementedError("claim_token function not implemented.") 
 
 class BasicViewIterator(ViewIterator):
     """Iterator object to fetch tokens while available.
@@ -52,10 +60,6 @@ class BasicViewIterator(ViewIterator):
         self.view_params = view_params
     
     def claim_token(self, allowed_failures=10):
-        """Get the first available token from a view.
-         @param allowed_failures: the number of times a lock failure may
-         occur before giving up. Default=10.
-        """
         count = 0
         while count < allowed_failures:
             count += 1
@@ -75,6 +79,7 @@ class BasicViewIterator(ViewIterator):
 
 
 class MultiKeyViewIterator(ViewIterator):
+    # JB: FIXME: document purpose of class
     def __init__(self, client, view, modifier, key_iterator, view_params={}):
         self.client = client
         self.view = view
@@ -92,6 +97,7 @@ class MultiKeyViewIterator(ViewIterator):
             raise StopIteration
     
     def claim_token(self, allowed_failures=10):
+        # JB: FIXME: count is not incremented
         count = 0
         while count < allowed_failures:
             try:
@@ -111,6 +117,7 @@ class MultiKeyViewIterator(ViewIterator):
 
 
 class ViewKeyIterator(object):
+    # JB: FIXME: document purpose of class
     def __init__(self, values, perms):
         self.values = values
         self.perms = perms
