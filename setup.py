@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 from distutils.core import setup
 
 setup(name='picas',
@@ -9,5 +8,5 @@ setup(name='picas',
       author_email='jan.bot@surfsara.nl',
       url='https://github.org/jjbot/picasclient/',
       packages=['picas'],
-      install_requires=['couchdb']
+      install_requires=['couchdb', 'numpy']
      )
