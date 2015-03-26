@@ -5,7 +5,7 @@ Created on Mon May 21 16:15:25 2012
 @author: Jan Bot
 """
 
-from .document import Task
+from .documents import Task
 from couchdb.http import ResourceConflict
 
 
@@ -56,10 +56,8 @@ class TaskViewIterator(ViewIterator):
 
     def __init__(self, database, view, **view_params):
         """
-        @param client: CouchClient for handling the connection to the CouchDB
-        server.
-        @param database: CouchDB view from which to fetch the task.
-        @param task_modifier: instance of a TaskModifier.
+        @param database: CouchDB database to get tasks from.
+        @param view: CouchDB view from which to fetch the task.
         @param view_params: parameters which need to be passed on to the view
         (optional).
         """

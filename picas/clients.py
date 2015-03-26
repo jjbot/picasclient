@@ -6,7 +6,7 @@ Created on Mon Jun  4 11:40:06 2012
 @author: Jan Bot
 @author: Joris Borgdorff
 """
-from .document import Document
+from .documents import Document
 import random
 
 # Couchdb imports

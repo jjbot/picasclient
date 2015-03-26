@@ -30,7 +30,7 @@ class RunActor(object):
         time = Timer()
         self.prepare_env()
         try:
-            for task in TaskViewIterator('todo', database=self.db):
+            for task in TaskViewIterator(self.db, 'todo'):
                 self.prepare_run()
 
                 try:
