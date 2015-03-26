@@ -1,4 +1,4 @@
-#!/usr/env python
+#!/usr/bin/env python
 
 from picas.actors import RunActor
 from picas.clients import CouchDB

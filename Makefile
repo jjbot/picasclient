@@ -1,6 +1,6 @@
 .PHONY: all requirements test-requirements test clean pyflakes unittest unittest-coverage fulltest install reinstall
 
-PYTHON_FIND=find picas tests -name '*.py'
+PYTHON_FIND=find picas tests scripts -name '*.py'
 
 all: install
 
