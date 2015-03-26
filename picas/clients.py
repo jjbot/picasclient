@@ -105,8 +105,8 @@ class CouchDB(object):
 
         - If the document was newly created and the _id is already is in the
           database the document will not be added.
-        - If the document is an existing document, it will be updated if the _rev
-          key matches.
+        - If the document is an existing document, it will be updated if the
+          _rev key matches.
 
         :param tasks [task1, task2, ...]; tasks for which the save was
                 succesful will get new _rev values
@@ -124,7 +124,8 @@ class CouchDB(object):
 
         return result
 
-    def add_view(self, view, map_fun, reduce_fun=None, design_doc="Monitor", *args, **kwargs):
+    def add_view(self, view, map_fun, reduce_fun=None, design_doc="Monitor",
+                 *args, **kwargs):
         """ Add a view to the database
         All extra parameters are passed to couchdb.design.ViewDefinition
         :param view: name of the view

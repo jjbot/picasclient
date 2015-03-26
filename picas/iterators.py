@@ -74,4 +74,3 @@ class TaskViewIterator(ViewIterator):
                 pass
 
         raise EnvironmentError("Unable to claim task.")
-

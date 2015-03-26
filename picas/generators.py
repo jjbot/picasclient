@@ -5,6 +5,7 @@ Created on Mon May 21 16:13:58 2012
 @author: Jan Bot
 """
 
+
 class TokenGenerator(object):
     """Object to generate the standard tokens with.
     """

@@ -5,11 +5,8 @@ from nose.tools import assert_equals, assert_raises, assert_true
 
 ''' @author Joris Borgdorff '''
 
-
-def setup_module(module):
-    global test_id, test_other_id
-    test_id = 'mydoc'
-    test_other_id = 'myotherdoc'
+test_id = 'mydoc'
+test_other_id = 'myotherdoc'
 
 
 def test_create():
@@ -47,11 +44,12 @@ def test_attachment():
     attach = doc.get_attachment('mytext.json')
     assert_equals(attach['content_type'], 'application/json')
 
+
 class TestTask:
-    
+
     def setup(self):
         self.task = Task({'_id': test_id})
-    
+
     def test_id(self):
         assert_equals(self.task.id, test_id)
         assert_equals(self.task.value['_id'], test_id)

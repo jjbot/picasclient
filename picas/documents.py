@@ -101,7 +101,7 @@ class Document(object):
 
     def remove_attachment(self, name):
         del self.doc['_attachments'][name]
-	return self
+        return self
 
     def _update_hostname(self):
         self.doc['hostname'] = socket.gethostname()
@@ -235,4 +235,3 @@ class Job(Document):
         self.id = 'archived-' + self.id + '-' + str(seconds())
         del self.doc['_rev']
         return self
-

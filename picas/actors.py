@@ -85,4 +85,3 @@ class RunActor(object):
         """Method which gets called after the run method has completed.
         """
         pass
-
