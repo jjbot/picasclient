@@ -217,6 +217,8 @@ class Job(Document):
         return self
 
     def archive(self):
+        if self.doc['done'] <= 0:
+            self.doc['done'] = seconds()
         self.doc['archive'] = seconds()
         self.id = 'archived-' + self.id + '-' + str(seconds())
         del self.doc['_rev']
