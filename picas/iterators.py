@@ -5,125 +5,156 @@ Created on Mon May 21 16:15:25 2012
 @author: Jan Bot
 """
 
-# Python imports
-import random
+from .documents import Task
+from couchdb.http import ResourceConflict
+import time
 
-# CouchDB immports
-from couchdb import ResourceConflict
 
 class ViewIterator(object):
-    """Dummy class to show what to implement for a PICaS iterator.
     """
-    def __init__(self, client, view, token_modifier, view_params={}):
-        pass
-    
-    def __repr__(self):
-        return "<ViewIterator object>"
-    
-    def __str__(self):
-        return "<view: " + self.view + ">"
-    
+    Dummy class to show what to implement for a PICaS iterator.
+    """
+
+    def __init__(self):
+        self._stop = False
+
     def __iter__(self):
         """Python needs this."""
         return self
-    
-    def next(self):
-        try:
-            return self.claim_token()
-        except IndexError:
-            raise StopIteration
-        raise StopIteration
 
-class BasicViewIterator(ViewIterator):
-    """Iterator object to fetch tokens while available.
-    """
-    def __init__(self, client, view, token_modifier, view_params={}):
+    def reset(self):
+        self._stop = False
+
+    def stop(self):
+        self._stop = True
+
+    def is_stopped(self):
+        return self._stop
+
+    def next(self):
         """
-        @param client: CouchClient for handling the connection to the CouchDB
-        server.
-        @param view: CouchDB view from which to fetch the token.
-        @param token_modifier: instance of a TokenModifier.
+        Get the next task.
+        @throws: StopIteration: if no more items are available
+        @throws: EnvironmentError: if there is too much contention to
+                                   lock an item for use.
+        """
+        if self.is_stopped():
+            raise StopIteration
+
+        try:
+            return self.claim_task()
+        except IndexError:
+            self.stop()
+            raise StopIteration
+
+    def claim_task(self):
+        """
+        Get the first available task from a view.
+        """
+        raise NotImplementedError("claim_task function not implemented.")
+
+
+def _claim_task(database, view, allowed_failures=10, **view_params):
+    for _ in xrange(allowed_failures):
+        try:
+            doc = database.get_single_from_view(view, window_size=100,
+                                                **view_params)
+            task = Task(doc)
+            return database.save(task.lock())
+        except ResourceConflict:
+            pass
+    raise EnvironmentError("Unable to claim task.")
+
+
+class TaskViewIterator(ViewIterator):
+
+    """Iterator object to fetch tasks while available.
+    """
+    def __init__(self, database, view, **view_params):
+        """
+        @param database: CouchDB database to get tasks from.
+        @param view: CouchDB view from which to fetch the task.
         @param view_params: parameters which need to be passed on to the view
         (optional).
         """
-        self.client = client
+        super(TaskViewIterator, self).__init__()
+        self.database = database
         self.view = view
-        self.token_modifier = token_modifier
         self.view_params = view_params
-    
-    def claim_token(self, allowed_failures=10):
-        """Get the first available token from a view.
-         @param allowed_failures: the number of times a lock failure may
-         occur before giving up. Default=10.
+
+    def claim_task(self):
+        return _claim_task(self.database, self.view, **self.view_params)
+
+
+class PrioritizedViewIterator(ViewIterator):
+    """
+    Iterator object to fetch tasks while available, first from a high
+    priority view and then from a low priority view.
+    """
+
+    def __init__(self, database, high_priority_view, low_priority_view,
+                 **view_params):
         """
-        count = 0
-        while count < allowed_failures:
-            count += 1
-            try:
-                (key, ref) = self.client.get_token(self.view, 
-                        view_params=self.view_params, window_size=100)
-                document_index = ref
-                if type(ref) == list:
-                    document_index = ref[0]
-                record = self.client.db[document_index]
-                modified_record = self.token_modifier.lock(record)
-                return (key, ref, self.client.modify_token(modified_record) )
-            except ResourceConflict:
-                pass
-        if count == allowed_failures:
-            raise EnvironmentError("Unable to claim token.")
-
-
-class MultiKeyViewIterator(ViewIterator):
-    def __init__(self, client, view, modifier, key_iterator, view_params={}):
-        self.client = client
-        self.view = view
-        self.token_modifier = modifier
-        self.key_iterator = key_iterator
+        @param database: CouchDB database to get tasks from.
+        @param high_priority_view: CouchDB view from which to fetch tasks
+               first.
+        @param low_priority_view: CouchDB view to get tasks from if no high
+                                  priority tasks are available.
+        @param view_params: parameters which need to be passed on to the view
+        (optional).
+        """
+        super(PrioritizedViewIterator, self).__init__()
+        self.database = database
+        self.high_priority_view = high_priority_view
+        self.low_priority_view = low_priority_view
         self.view_params = view_params
-        self.get_view_keys()
-        self.view_params.update(self.keys)
-    
-    def get_view_keys(self):
+
+    def claim_task(self):
         try:
-            self.keys = self.key_iterator.next()
-            print self.keys
-        except:
-            raise StopIteration
-    
-    def claim_token(self, allowed_failures=10):
-        count = 0
-        while count < allowed_failures:
-            try:
-                (key, ref) = self.client.get_token(self.view, 
-                        self.view_params)
-                record = ref
-                if type(ref) == list:
-                    document_index = ref[0]
-                    record = self.client.db[document_index]
-                modified_token = self.token_modifier.lock(record)
-                return (key, self.client.modify_token(modified_token) )
-            except ResourceConflict:
-                pass
-            except IndexError:
-                self.get_view_keys()
-                self.view_params.update(self.keys)
+            _claim_task(self.database, self.high_priority_view,
+                        **self.view_params)
+        except IndexError:
+            # don't catch the second IndexError:
+            # if both views are empty, fail.
+            _claim_task(self.database, self.low_priority_view,
+                        **self.view_params)
 
 
-class ViewKeyIterator(object):
-    def __init__(self, values, perms):
-        self.values = values
-        self.perms = perms
-    
-    def __iter__(self):
-        return self
-    
+class EndlessViewIterator(ViewIterator):
+    """
+    Iterator that will endlessly fetch tasks from a ViewIterator, sleeping
+    when none are available.
+    """
+    def __init__(self, view_iterator, sleep_sec=10, stop_callback=None,
+                 **stop_callback_args):
+        """
+        @param view_iterator: ViewIterator to get actual tasks from.
+        @param sleep_sec: number of seconds to wait before trying the
+                          view_iterator again. Set to 0 to do a busy wait.
+        @param stop_callback: callback function to determine whether this
+                              iterator should stop feeding tasks
+        @param stop_callback_args: arguments to the stop_callback function.
+        """
+        super(EndlessViewIterator, self).__init__()
+        self.iterator = view_iterator
+        self.sleep_sec = sleep_sec
+        self.stop_callback = stop_callback
+        self.stop_callback_args = stop_callback_args
+
+    def is_cancelled(self):
+        return (self.is_stopped() or
+                (self.stop_callback is not None and
+                 self.stop_callback(**self.stop_callback_args)))
+
     def next(self):
-        if len(self.values) > 0:
-            value = self.values.pop(random.randint(0, len(self.values)-1 ) )
-            return {
-                "startkey":[value, 0],
-                "endkey": [value, self.perms]
-            }
-        else:
-            raise StopIteration
+        while not self.is_cancelled():
+            try:
+                return self.iterator.next()
+            except StopIteration:
+                self.iterator.reset()
+                time.sleep(self.sleep_sec)
+
+        # no longer continue
+        self.iterator.stop()
+        self.stop()
+        raise StopIteration
