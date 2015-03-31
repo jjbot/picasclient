@@ -32,7 +32,7 @@ test: test-requirements pyflakes unittest
 
 unittest-coverage:
 	@echo "======= Unit Tests ========="
-	@nosetests --with-coverage
+	@nosetests --with-coverage --cover-package=picas
 
 fulltest: test-requirements pep8 pyflakes unittest-coverage
 
