@@ -13,15 +13,20 @@ class RunActor(object):
     """Executor class to be overwritten in the client implementation.
     """
 
-    def __init__(self, db):
+    def __init__(self, db, iterator=None, view='todo', **view_params):
         """
         @param database: the database to get the tasks from.
         """
         if db is None:
             raise ValueError("Database must be initialized")
-
         self.db = db
         self.tasks_processed = 0
+
+        self.iterator = iterator
+        if iterator is None:
+            self.iterator = TaskViewIterator(self.db, view, **view_params)
+        else:
+            self.iterator = iterator
 
     def run(self, maxtime=None, avg_time_factor=0.0):
         """Run method of the actor, executes the application code by iterating
@@ -30,7 +35,7 @@ class RunActor(object):
         time = Timer()
         self.prepare_env()
         try:
-            for task in TaskViewIterator(self.db, 'todo'):
+            for task in self.iterator:
                 self.prepare_run()
 
                 try:
