@@ -4,6 +4,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
+
 setup(name='picas',
       version='0.2',
       description='Python client using CouchDB as a token pool server.',
