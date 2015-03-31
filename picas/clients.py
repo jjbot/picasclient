@@ -10,10 +10,9 @@ from .documents import Document
 import random
 
 # Couchdb imports
+import couchdb
 from couchdb.design import ViewDefinition
 from couchdb.http import ResourceConflict
-from couchdb.client import Server
-
 
 class CouchDB(object):
 
@@ -21,17 +20,16 @@ class CouchDB(object):
     """
 
     def __init__(self, url="http://localhost:5984", db="test",
-                 username="", password=""):
+                 username=None, password=""):
         """Create a CouchClient object.
         :param url: the location where the CouchDB instance is located,
                     including the port at which it's listening.
                     Default: http://localhost:5984
         :param db: the database to use. Default: test.
         """
-        self.server = Server(url=url)
-        if username != "":
-            self.server.resource.credentials = (username, password)
-        self.db = self.server[db]
+        self.db = couchdb.Database(url + "/" + db)
+        if username is not None:
+            self.db.resource.credentials = (username, password)
 
     def __getitem__(self, idx):
         return self.db[idx]
