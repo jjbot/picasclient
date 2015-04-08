@@ -193,7 +193,7 @@ class Job(Document):
         'done': 0,
         'queue': 0,
         'method': '',
-        'archive': 0
+        'archive': 0,
     }
 
     def __init__(self, job):
@@ -210,6 +210,8 @@ class Job(Document):
 
     def start(self):
         self.doc['start'] = seconds()
+        self.doc['done'] = 0
+        self.doc['archive'] = 0
         return self._update_hostname()
 
     def finish(self):
