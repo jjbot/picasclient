@@ -46,7 +46,16 @@ class RunActor(object):
                     task.error(msg, exception=ex)
                     print(msg)
 
-                self.db.save(task)
+                while True:
+                    try:
+                        self.db.save(task)
+                        break
+                    except ResourceConflict:
+                        # simply overwrite changes - model results are more
+                        # important
+                        new_task = self.db.get(task.id)
+                        task['_rev'] = new_task.rev
+                        
                 self.cleanup_run()
                 self.tasks_processed += 1
 
