@@ -4,6 +4,7 @@ Created on Mon May 21 16:11:08 2012
 
 @author: Jan Bot
 """
+from __future__ import print_function
 
 # Python imports
 import logging
@@ -54,8 +55,8 @@ class CouchDBLogger(logging.Handler):
                 self.db[id] = log_dict
                 done = True
             except Exception as e:
-                print e
-                print log_dict
+                print(e)
+                print(log_dict)
                 count += 1
                 time.sleep(0.5)
 

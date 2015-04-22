@@ -65,7 +65,7 @@ class Document(object):
             if mimetype is None:
                 mimetype = 'text/plain'
 
-        b64data = base64.b64encode(data)
+        b64data = base64.b64encode(data.encode('utf-8'))
         self.doc['_attachments'][name] = {
             'content_type': mimetype, 'data': b64data}
 
@@ -81,7 +81,7 @@ class Document(object):
 
         if 'data' in self.doc['_attachments'][name]:
             attachment['data'] = base64.b64decode(
-                self.doc['_attachments'][name]['data'])
+                self.doc['_attachments'][name]['data']).decode('utf-8')
 
         return attachment
 

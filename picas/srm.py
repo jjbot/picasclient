@@ -4,6 +4,7 @@ Created on Sun May 20 18:16:41 2012
 
 @author: Jan Bot, Leiden University, Delft University of Technology, SURFsara
 """
+from __future__ import print_function
 
 # Python imports
 import threading
@@ -110,7 +111,7 @@ class SRMClient(object):
         """
         sURL = self.srm_host + loc
         cmd = ['srmls', sURL]
-        print " ".join(cmd)
+        print(" ".join(cmd))
         (returncode, stdout, stderr) = execute(cmd)
         if returncode == 0:
             bn = path.basename(loc)
@@ -142,7 +143,7 @@ class SRMClient(object):
         
         cmd = ['srmcp', '-2', '-server_mode=passive', 
                'file:///' + local_file, srm_url]
-        print cmd
+        print(cmd)
         (returncode, stdout, stderr) = execute(cmd)
         if returncode == 0:
             pass

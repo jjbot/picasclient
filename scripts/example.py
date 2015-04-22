@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 
 from picas.actors import RunActor
 from picas.clients import CouchDB
@@ -15,7 +16,7 @@ class ExampleActor(RunActor):
 
     def process_token(self, ref, token):
         # this is where all the work gets done. Start editing here.        
-        print token
+        print(token)
         
     def cleanup_run(self, *kargs, **kvargs):
         pass

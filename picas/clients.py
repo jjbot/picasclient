@@ -6,8 +6,10 @@ Created on Mon Jun  4 11:40:06 2012
 @author: Jan Bot
 @author: Joris Borgdorff
 """
+from __future__ import print_function
 from .documents import Document
 import random
+import sys
 
 # Couchdb imports
 import couchdb
@@ -113,7 +115,7 @@ class CouchDB(object):
         updated = self.db.update([doc.value for doc in docs])
 
         result = [False] * len(docs)
-        for i in xrange(len(docs)):
+        for i in range(len(docs)):
             is_added, _id, _rev = updated[i]
             if is_added:
                 docs[i]['_id'] = _id
@@ -162,11 +164,13 @@ class CouchDB(object):
             try:
                 self.delete(doc)
             except ResourceConflict as ex:
-                print("Could not delete document", doc.id, " (rev", doc.rev,
-                      ") due to resource conflict:", ex)
+                print("Could not delete document %s (rev %s) "
+                      "due to resource conflict: %s"
+                      % (doc.id, doc.rev, str(ex)), file=sys.stderr)
                 result[i] = False
             except Exception as ex:
-                print "Could not delete document ", doc, ':', ex
+                print("Could not delete document %s: %s" %(str(doc), str(ex)),
+                      file=sys.stderr)
                 result[i] = False
 
         return result

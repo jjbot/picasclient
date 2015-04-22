@@ -32,6 +32,9 @@ class ViewIterator(object):
         return self._stop
 
     def next(self):
+        return self.__next__()
+
+    def __next__(self):
         """
         Get the next task.
         @throws: StopIteration: if no more items are available
@@ -55,7 +58,7 @@ class ViewIterator(object):
 
 
 def _claim_task(database, view, allowed_failures=10, **view_params):
-    for _ in xrange(allowed_failures):
+    for _ in range(allowed_failures):
         try:
             doc = database.get_single_from_view(view, window_size=100,
                                                 **view_params)
@@ -146,7 +149,7 @@ class EndlessViewIterator(ViewIterator):
                 (self.stop_callback is not None and
                  self.stop_callback(**self.stop_callback_args)))
 
-    def next(self):
+    def __next__(self):
         while not self.is_cancelled():
             try:
                 return self.iterator.next()

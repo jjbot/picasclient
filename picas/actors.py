@@ -7,6 +7,7 @@ Created on Mon Jun  4 11:46:25 2012
 from .util import Timer
 from .iterators import TaskViewIterator
 
+from couchdb.http import ResourceConflict
 
 class RunActor(object):
 
