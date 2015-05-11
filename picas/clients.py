@@ -23,7 +23,7 @@ class CouchDB(object):
     """
 
     def __init__(self, url="http://localhost:5984", db="test",
-                 username=None, password=""):
+                 username=None, password="", ssl_verification=True):
         """Create a CouchClient object.
         :param url: the location where the CouchDB instance is located,
                     including the port at which it's listening.
@@ -33,6 +33,9 @@ class CouchDB(object):
         self.db = couchdb.Database(url + "/" + db)
         if username is not None:
             self.db.resource.credentials = (username, password)
+
+        if not ssl_verification:
+            self.db.resource.session.disable_ssl_verification()
 
     def __getitem__(self, idx):
         return self.db[idx]
