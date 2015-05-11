@@ -9,6 +9,7 @@ from .iterators import TaskViewIterator
 
 from couchdb.http import ResourceConflict
 
+
 class RunActor(object):
 
     """Executor class to be overwritten in the client implementation.
@@ -56,7 +57,7 @@ class RunActor(object):
                         # important
                         new_task = self.db.get(task.id)
                         task['_rev'] = new_task.rev
-                        
+
                 self.cleanup_run()
                 self.tasks_processed += 1
 

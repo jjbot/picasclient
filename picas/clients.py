@@ -16,6 +16,7 @@ import couchdb
 from couchdb.design import ViewDefinition
 from couchdb.http import ResourceConflict
 
+
 class CouchDB(object):
 
     """Client class to handle communication with the CouchDB back-end.
@@ -169,8 +170,8 @@ class CouchDB(object):
                       % (doc.id, doc.rev, str(ex)), file=sys.stderr)
                 result[i] = False
             except Exception as ex:
-                print("Could not delete document %s: %s" %(str(doc), str(ex)),
-                      file=sys.stderr)
+                print("Could not delete document %s: %s"
+                      % (str(doc), str(ex)), file=sys.stderr)
                 result[i] = False
 
         return result

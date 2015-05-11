@@ -115,12 +115,12 @@ class PrioritizedViewIterator(ViewIterator):
     def claim_task(self):
         try:
             return _claim_task(self.database, self.high_priority_view,
-                        **self.view_params)
+                               **self.view_params)
         except IndexError:
             # don't catch the second IndexError:
             # if both views are empty, fail.
             return _claim_task(self.database, self.low_priority_view,
-                        **self.view_params)
+                               **self.view_params)
 
 
 class EndlessViewIterator(ViewIterator):
