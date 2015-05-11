@@ -194,6 +194,9 @@ class Task(Document):
         except:
             return []
 
+    def is_done(self):
+        return self.doc['done'] != 0
+
 
 class Job(Document):
     __BASE = {
@@ -235,3 +238,6 @@ class Job(Document):
         self.id = 'archived-' + self.id + '-' + str(seconds())
         del self.doc['_rev']
         return self
+
+    def is_done(self):
+        return self.doc['done'] != 0
