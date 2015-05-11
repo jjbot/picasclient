@@ -69,10 +69,13 @@ class Document(object):
         self.doc['_attachments'][name] = {
             'content_type': mimetype, 'data': b64data}
 
-    def get_attachment(self, name):
+    def get_attachment(self, name, retrieve_from_database=None):
         ''' Gets an attachment dict from the document.
         Attachment data may not have been copied over from the
-        database, in that case it will have an md5 checksum. '''
+        database, in that case it will have an md5 checksum.
+        A CouchDB database may be set in retrieve_from_database to retrieve
+        the data if it is not present.
+        '''
         # Copy all attributes except data, it may be very large
         attachment = {}
         for key in self.doc['_attachments'][name]:
@@ -82,6 +85,13 @@ class Document(object):
         if 'data' in self.doc['_attachments'][name]:
             attachment['data'] = base64.b64decode(
                 self.doc['_attachments'][name]['data']).decode('utf-8')
+        elif retrieve_from_database is not None:
+            db = retrieve_from_database.db
+            with db.get_attachment(self.id, name) as f_attach:
+                attachment['data'] = f_attach.read()
+
+            b64data = base64.b64encode(attachment['data'].encode('utf-8'))
+            self.doc['_attachments'][name]['data'] = b64data
 
         return attachment
 
