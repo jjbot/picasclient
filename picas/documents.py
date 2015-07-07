@@ -104,6 +104,20 @@ class Document(object):
         return self
 
 
+class User(Document):
+    ''' CouchDB user '''
+    def __init__(self, username, password, roles=[], data={}):
+        super(User, self).__init__(
+            data=data,
+            base={
+                '_id': 'org.couchdb.user:{}'.format(username),
+                'name': username,
+                'type': 'user',
+                'password': password,
+                'roles': roles,
+            })
+
+
 class Task(Document):
     __BASE = {
         'type': 'task',
