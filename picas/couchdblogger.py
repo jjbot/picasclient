@@ -15,10 +15,13 @@ import time
 # CouchDB imports
 from couchdb import Server
 
+
 class CouchDBLogger(logging.Handler):
+
     """Logger class which writes messages to CouchDB in a predefined 
     format.
     """
+
     def __init__(self, url, db):
         """Initiation function.
         :param url: the url including the port on which the database 
@@ -31,7 +34,7 @@ class CouchDBLogger(logging.Handler):
         self.hostname = socket.gethostname()
         random.seed(time.time())
         self.trace_nr = int(random.random() * 100000)
-    
+
     def emit(self, record):
         """Function used by the Python logging framework to output messages.
         Internal only.
@@ -46,12 +49,12 @@ class CouchDBLogger(logging.Handler):
             'trance_nr': self.trace_nr,
             'type': 'log'
         }
-        
+
         count = 0
         done = False
         while(count < 10 and not done):
             try:
-                id = self.hostname + ":" + str(int(time.time())) 
+                id = self.hostname + ":" + str(int(time.time()))
                 self.db[id] = log_dict
                 done = True
             except Exception as e:
@@ -61,5 +64,5 @@ class CouchDBLogger(logging.Handler):
                 time.sleep(0.5)
 
 default_log_formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
