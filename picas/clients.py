@@ -16,6 +16,7 @@ import couchdb
 from couchdb.design import ViewDefinition
 from couchdb.http import ResourceConflict
 
+
 class CouchDB(object):
 
     """Client class to handle communication with the CouchDB back-end.
@@ -193,3 +194,20 @@ class CouchDB(object):
         """
         docs = self.get_from_view(view, design_doc=design_doc)
         return self.delete_documents(docs)
+
+    def set_users(self, admins=None, members=None, admin_roles=None,
+                  member_roles=None):
+        security = self.db.resource.get_json("_security")[2]
+        def try_set(value, d, key, subkey):
+            if value is not None:
+                try:
+                    d[key][subkey] = value
+                except KeyError:
+                    d[key] = {subkey: value}
+
+        try_set(admins, security, 'admins', 'names')
+        try_set(members, security, 'members', 'names')
+        try_set(admin_roles, security, 'admins', 'roles')
+        try_set(member_roles, security, 'members', 'roles')
+
+        self.db.resource.put("_security", security)
