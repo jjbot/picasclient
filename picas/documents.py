@@ -57,6 +57,15 @@ class Document(object):
         self.doc.update(values)
 
     def put_attachment(self, name, data, mimetype=None):
+        '''
+        Put an attachment in the document.
+        
+        The attachment data must be provided as str in Python 2 and bytes in
+        Python 3.
+        
+        The mimetype, if not provided, is guessed from the filename and
+        defaults to text/plain.
+        '''
         if '_attachments' not in self.doc:
             self.doc['_attachments'] = {}
 
@@ -65,7 +74,7 @@ class Document(object):
             if mimetype is None:
                 mimetype = 'text/plain'
 
-        b64data = base64.b64encode(data.encode('utf-8'))
+        b64data = base64.b64encode(data)
         self.doc['_attachments'][name] = {
             'content_type': mimetype, 'data': b64data}
 
@@ -75,6 +84,9 @@ class Document(object):
         database, in that case it will have an md5 checksum.
         A CouchDB database may be set in retrieve_from_database to retrieve
         the data if it is not present.
+        
+        The attachment data will be returned as str in Python 2 and bytes in
+        Python 3.
         '''
         # Copy all attributes except data, it may be very large
         attachment = {}
@@ -84,13 +96,13 @@ class Document(object):
 
         if 'data' in self.doc['_attachments'][name]:
             attachment['data'] = base64.b64decode(
-                self.doc['_attachments'][name]['data']).decode('utf-8')
+                self.doc['_attachments'][name]['data'])
         elif retrieve_from_database is not None:
             db = retrieve_from_database.db
             with db.get_attachment(self.id, name) as f_attach:
                 attachment['data'] = f_attach.read()
 
-            b64data = base64.b64encode(attachment['data'].encode('utf-8'))
+            b64data = base64.b64encode(attachment['data'])
             self.doc['_attachments'][name]['data'] = b64data
 
         return attachment
