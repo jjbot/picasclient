@@ -59,10 +59,10 @@ class Document(object):
     def put_attachment(self, name, data, mimetype=None):
         '''
         Put an attachment in the document.
-        
+
         The attachment data must be provided as str in Python 2 and bytes in
         Python 3.
-        
+
         The mimetype, if not provided, is guessed from the filename and
         defaults to text/plain.
         '''
@@ -84,7 +84,7 @@ class Document(object):
         database, in that case it will have an md5 checksum.
         A CouchDB database may be set in retrieve_from_database to retrieve
         the data if it is not present.
-        
+
         The attachment data will be returned as str in Python 2 and bytes in
         Python 3.
         '''
