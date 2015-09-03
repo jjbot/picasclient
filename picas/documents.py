@@ -87,6 +87,8 @@ class Document(object):
 
         The attachment data will be returned as str in Python 2 and bytes in
         Python 3.
+
+        Raises KeyError if attachment does not exist.
         '''
         # Copy all attributes except data, it may be very large
         attachment = {}
@@ -99,8 +101,11 @@ class Document(object):
                 self.doc['_attachments'][name]['data'])
         elif retrieve_from_database is not None:
             db = retrieve_from_database.db
-            with db.get_attachment(self.id, name) as f_attach:
+            f_attach = db.get_attachment(self.id, name)
+            try:
                 attachment['data'] = f_attach.read()
+            finally:
+                f_attach.close()
 
             b64data = base64.b64encode(attachment['data'])
             self.doc['_attachments'][name]['data'] = b64data
