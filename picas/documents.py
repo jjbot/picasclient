@@ -22,11 +22,26 @@ class Document(object):
 
         self.doc = data
 
+    # Python Dict emulation:
+    # docs.python.org/2/reference/datamodel.html#emulating-container-types
+    def __len__(self):
+        return self.doc.__len__()
+
     def __getitem__(self, idx):
         return self.doc.__getitem__(idx)
 
     def __setitem__(self, idx, value):
         return self.doc.__setitem__(idx, value)
+
+    def __delitem__(self, idx):
+        return self.doc.__delitem__(idx)
+
+    def __contains__(self, idx):
+        return self.doc.__contains__(idx)
+
+    def __iter__(self):
+        return self.doc.__iter__()
+    # End python dict emulation
 
     @property
     def id(self):
@@ -144,7 +159,8 @@ class Task(Document):
         'scrub_count': 0,
         'input': {},
         'output': {},
-        'error': []
+        'uploads': {},
+        'error': [],
     }
 
     """Class to manage task modifications with.
@@ -185,9 +201,17 @@ class Task(Document):
 
     @output.setter
     def output(self, output):
-        """Add the input for the RunActor to the task.
+        """Add the output of the RunActor to the task.
         """
         self.doc['output'] = output
+
+    @property
+    def uploads(self):
+        return self.doc['uploads']
+
+    @uploads.setter
+    def uploads(self, uploads):
+        self.doc['uploads'] = uploads
 
     def scrub(self):
         """
