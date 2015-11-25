@@ -142,7 +142,7 @@ class User(Document):
         super(User, self).__init__(
             data=data,
             base={
-                '_id': 'org.couchdb.user:{}'.format(username),
+                '_id': 'org.couchdb.user:{0}'.format(username),
                 'name': username,
                 'type': 'user',
                 'password': password,
