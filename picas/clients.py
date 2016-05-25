@@ -42,6 +42,18 @@ class CouchDB(object):
         else:
             self.db = server[db]
 
+    def copy(self):
+        resource = self.db.resource
+        try:
+            username, password = resource.credentials
+        except TypeError:
+            username, password = None, ""
+
+        return CouchDB(
+            url=resource.url[:-len(self.db.name) - 1], db=self.db.name,
+            username=username, password=password,
+            ssl_verification=resource.session._disable_ssl_verification)
+
     def __getitem__(self, idx):
         return self.db[idx]
 
