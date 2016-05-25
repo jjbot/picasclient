@@ -30,7 +30,7 @@ def test_empty():
 
 def test_attachment():
     doc = Document()
-    data = "This is it"
+    data = b"This is it"
     doc.put_attachment('mytext.txt', data)
     attach = doc.get_attachment('mytext.txt')
     assert_equals(attach['content_type'], 'text/plain')
@@ -40,7 +40,7 @@ def test_attachment():
     doc.remove_attachment('mytext.txt')
     assert_true('mytext.txt' not in doc['_attachments'])
     assert_equals(attach['data'], data)
-    doc.put_attachment('mytext.json', '{}')
+    doc.put_attachment('mytext.json', b'{}')
     attach = doc.get_attachment('mytext.json')
     assert_equals(attach['content_type'], 'application/json')
 
