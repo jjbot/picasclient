@@ -69,35 +69,30 @@ class RunActor(object):
         finally:
             self.cleanup_env()
 
-    def prepare_env(self, *kargs, **kwargs):
+    def prepare_env(self, *args, **kwargs):
         """Method to be called to prepare the environment to run the
         application.
         """
         pass
 
-    def prepare_run(self, *kargs, **kwargs):
+    def prepare_run(self, *args, **kwargs):
         """Code to run before a task gets processed. Used e.g. for fetching
         inputs.
         """
         pass
 
     def process_task(self, task):
-        """The function to overwrite which processes the tasks themselves.
-        @param key: the task key. Should not be used to hold anything
-        informative as it is mainly used to determine the order in which the
-        tasks are returned.
-        @param key: the key indicating where the task is stored in the
-        database.
-        @param task: the task itself.
+        """The function to override, which processes the tasks themselves.
+        @param task: the task to process
         """
         raise NotImplementedError
 
-    def cleanup_run(self, *kargs, **kwargs):
+    def cleanup_run(self, *args, **kwargs):
         """Code to run after a task has been processed.
         """
         pass
 
-    def cleanup_env(self, *kargs, **kwargs):
+    def cleanup_env(self, *args, **kwargs):
         """Method which gets called after the run method has completed.
         """
         pass
