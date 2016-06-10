@@ -18,8 +18,6 @@ Created on Thu May 17 15:00:59 2012
 import threading
 import logging
 import Queue
-import time
-import random
 
 from PiCaS import SRMClient
 
