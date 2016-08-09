@@ -13,5 +13,7 @@ setup(name='picas',
       url='https://github.org/jjbot/picasclient/',
       packages=['picas'],
       install_requires=['couchdb'],
-      tests_require=['pyflakes', 'pep8', 'nose'],
+      extras_require={
+          'test': ['flake8', 'nose'],
+      },
      )
