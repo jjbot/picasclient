@@ -21,3 +21,8 @@ To test, run
 flake8 picas tests
 nosetests tests
 ```
+
+
+## Travis build status
+
+[![Build Status](https://travis-ci.org/sara-nl/picasclient.svg?branch=master)](https://travis-ci.org/sara-nl/picasclient)
