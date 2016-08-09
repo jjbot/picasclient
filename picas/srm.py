@@ -14,6 +14,7 @@ Created on Sun May 20 18:16:41 2012
 
 @author: Jan Bot, Leiden University, Delft University of Technology, SURFsara
 """
+from __future__ import print_function
 
 # Python imports
 import threading
@@ -21,18 +22,20 @@ import logging
 import Queue
 from os import path
 
-# PiCaS imports
-import picasclient
-from picasclient.executers import execute, execute_old
+from .executers import execute, execute_old
 
 
 def download(remotefile, local_dir):
-    picasclient.logging.debug("Downloading: " + remotefile)
-    raise NotImplementedError("Download function not implemented yet. Use SRMClient class.")
+    logging.debug("Downloading: " + remotefile)
+    raise NotImplementedError(
+        "Download function not implemented yet. Use SRMClient class.")
+
 
 def upload(localfile, srm_dir):
-    picasclient.logging.debug("Uploading: " + localfile)
-    raise NotImplementedError("Upload function not implemented yet. Use SRMClient class.")
+    logging.debug("Uploading: " + localfile)
+    raise NotImplementedError(
+        "Upload function not implemented yet. Use SRMClient class.")
+
 
 def download_many(files, poolsize=10, logger=None):
     """Download a number of files in parallel.
@@ -44,26 +47,30 @@ def download_many(files, poolsize=10, logger=None):
     q = Queue.Queue()
     for v in files:
         q.put(v)
-    
+
     thread_pool = []
     for i in range(poolsize):
         d = Downloader(q, logger)
         d.start()
         thread_pool.append(d)
-    
+
     q.join()
     for d in thread_pool:
         d.join(1)
-        
+
+
 def upload_many(files, poolsize=10):
-    raise NotImplementedError("upload_many function not implemented. Use SRMClient class.")
-    
-    
+    raise NotImplementedError(
+        "upload_many function not implemented. Use SRMClient class.")
+
+
 class Downloader(threading.Thread):
+
     """Threaded SRM download class. Facilitates many simultaneous 
     connections to the SRM. Use with care: you can easily flood the
     SRM with too many request.
     """
+
     def __init__(self, queue, logger=None):
         """Initialization.
         @param queue: Python queue object containing all the files that need
@@ -78,7 +85,7 @@ class Downloader(threading.Thread):
             self.logger = logger
         self.srm = SRMClient(self.logger)
         self.daemon = False
-    
+
     def run(self):
         """Start the download worker. Starts downloading the first file 
         in the queue.
@@ -93,18 +100,20 @@ class Downloader(threading.Thread):
                     done = True
                 except:
                     count += 1
-            
-            self.q.task_done()            
+
+            self.q.task_done()
 
             if(count > 24):
-                self.logger.error("Download of " + f + 
-                        " failed after multiple tries.")
-                raise EnvironmentError("Download failed of: " + f)            
+                self.logger.error("Download of " + f +
+                                  " failed after multiple tries.")
+                raise EnvironmentError("Download failed of: " + f)
 
 
 class SRMClient(object):
+
     """Helper class to easily down- and upload files to/from SRM.
     """
+
     def __init__(self, logger, host="srm://srm.grid.sara.nl/"):
         """Init function.
         @param logger: Python logger.
@@ -120,7 +129,7 @@ class SRMClient(object):
         """
         sURL = self.srm_host + loc
         cmd = ['srmls', sURL]
-        print " ".join(cmd)
+        print(" ".join(cmd))
         (returncode, stdout, stderr) = execute(cmd)
         if returncode == 0:
             bn = path.basename(loc)
@@ -131,7 +140,7 @@ class SRMClient(object):
             return False
         else:
             return False
-        
+
     def upload(self, local_file, srm_dir, check=False):
         """Upload local file to the SRM.
         @local_file: the file that needs to be copied.
@@ -147,19 +156,19 @@ class SRMClient(object):
             if not path.isfile(local_file):
                 raise EnvironmentError(10, "File not found.", local_file)
             if self.remote_exists(srm_file):
-                raise EnvironmentError(11, "File exists on srm.", 
-                        srm_url)
-        
-        cmd = ['srmcp', '-2', '-server_mode=passive', 
+                raise EnvironmentError(11, "File exists on srm.",
+                                       srm_url)
+
+        cmd = ['srmcp', '-2', '-server_mode=passive',
                'file:///' + local_file, srm_url]
-        print cmd
+        print(cmd)
         (returncode, stdout, stderr) = execute(cmd)
         if returncode == 0:
             pass
         else:
             raise EnvironmentError("Upload failed.")
         return srm_url
-        
+
     def download(self, srm_file, local_dir="./", check=False):
         """Download a file from the SRM.
         @param srm_file: complete path to the file on the SRM.
@@ -171,8 +180,8 @@ class SRMClient(object):
         if check:
             if not self.remote_exists(srm_file):
                 raise EnvironmentError(10, "File not found.", srm_url)
-        
-        cmd = ['srmcp', '-2', '-server_mode=passive', 
+
+        cmd = ['srmcp', '-2', '-server_mode=passive',
                srm_url, 'file:///' + local_file]
         self.logger.info("Downloading: " + local_file)
         returncode = execute_old(" ".join(cmd))
@@ -183,7 +192,7 @@ class SRMClient(object):
             self.logger.error("Download failed of: " + srm_file)
             raise EnvironmentError("Download failed.")
         return local_file
-    
+
     def remove(self, srm_file):
         """Remove a file from the SRM.
         @param srm_file: Path to the file on the SRM.

@@ -12,82 +12,97 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Created on Mon Jun  4 11:46:25 2012
 
-@author: Jan Bot
+@author: Jan Bot, Joris Borgdorff
 """
+from .util import Timer
+from .iterators import TaskViewIterator
 
-import sys
-import time
+from couchdb.http import ResourceConflict
+
 
 class RunActor(object):
+
     """Executor class to be overwritten in the client implementation.
     """
-    def __init__(self, iterator, modifier):
+
+    def __init__(self, db, iterator=None, view='todo', **view_params):
         """
-        @param iterator: the view iterator to get the tokens from.
+        @param database: the database to get the tasks from.
         """
+        if db is None:
+            raise ValueError("Database must be initialized")
+        self.db = db
+        self.tasks_processed = 0
+
         self.iterator = iterator
-        self.client = iterator.client
-        self.modifier = modifier
-    
-    def run(self, maxtime=-1):
+        if iterator is None:
+            self.iterator = TaskViewIterator(self.db, view, **view_params)
+        else:
+            self.iterator = iterator
+
+    def run(self, maxtime=None, avg_time_factor=0.0):
         """Run method of the actor, executes the application code by iterating
-        over the available tokens in CouchDB.
+        over the available tasks in CouchDB.
         """
-        start = time.time()
+        time = Timer()
         self.prepare_env()
-        for key, ref, token in self.iterator:            
-            self.prepare_run()
-            self.process_token(ref, token)
-            self.cleanup_run()
-            if maxtime > 0:
-                now = time.time()
-                if now - start > maxtime:
-                    sys.exit(0)
-        self.cleanup_env()
-        
-    def prepare_env(self, *kargs, **kwargs):
-        """Method to be called to prepare the environment to run the 
+        try:
+            for task in self.iterator:
+                self.prepare_run()
+
+                try:
+                    self.process_task(task)
+                except Exception as ex:
+                    msg = ("Exception {0} occurred during processing: {1}"
+                           .format(type(ex), ex))
+                    task.error(msg, exception=ex)
+                    print(msg)
+
+                while True:
+                    try:
+                        self.db.save(task)
+                        break
+                    except ResourceConflict:
+                        # simply overwrite changes - model results are more
+                        # important
+                        new_task = self.db.get(task.id)
+                        task['_rev'] = new_task.rev
+
+                self.cleanup_run()
+                self.tasks_processed += 1
+
+                if maxtime is not None:
+                    will_elapse = ((avg_time_factor + self.tasks_processed) *
+                                   time.elapsed() / self.tasks_processed)
+                    if will_elapse > maxtime:
+                        break
+        finally:
+            self.cleanup_env()
+
+    def prepare_env(self, *args, **kwargs):
+        """Method to be called to prepare the environment to run the
         application.
         """
         pass
-    
-    def prepare_run(self, *kargs, **kwargs):
-        """Code to run before a token gets processed. Used e.g. for fetching
+
+    def prepare_run(self, *args, **kwargs):
+        """Code to run before a task gets processed. Used e.g. for fetching
         inputs.
         """
         pass
-    
-    def process_token(self, key, token):
-        """The function to overwrite which processes the tokens themselves.
-        @param key: the token key. Should not be used to hold anything
-        informative as it is mainly used to determine the order in which the
-        tokens are returned.
-        @param key: the key indicating where the token is stored in the 
-        database.
-        @param token: the token itself. !WARNING
-        """
-        modification = ()
-        for k, v in token.iteritems():
-            print k, v
-        raise NotImplementedError
-        return modification
 
-    def cleanup_run(self, *kargs, **kwargs):
-        """Code to run after a token has been processed.
+    def process_task(self, task):
+        """The function to override, which processes the tasks themselves.
+        @param task: the task to process
+        """
+        raise NotImplementedError
+
+    def cleanup_run(self, *args, **kwargs):
+        """Code to run after a task has been processed.
         """
         pass
-    
-    def cleanup_env(self, *kargs, **kwargs):
+
+    def cleanup_env(self, *args, **kwargs):
         """Method which gets called after the run method has completed.
         """
         pass
-    
-    def unlock_all(self, view):
-        rows = self.client.get_all(view)
-        updated_tokens = []
-        for row in rows:
-            updated_tokens.append(
-                    self.modifier.unlock(row['key'], row['value'])
-            )
-        status = self.client.update_all(updated_tokens)
-        return status
