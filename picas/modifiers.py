@@ -119,10 +119,10 @@ class BasicTokenModifier(TokenModifier):
     def scrub(self, token):
         """Token scrubber: makes sure a token can be handed out again.
         @param token: the token that needs to be scrubbed.
-        @return the scrubbed token. Should be uploaded to the server to finish 
-        the process.
+        @return the scrubbed token. Should be uploaded to the server to finish
+         the process.
         """
-        if not token.has_key('scrub_count'):
+        if not 'scrub_count' in token:
             token['scrub_count'] = 0
         token['scrub_count'] += 1
         token = self.unlock(token)

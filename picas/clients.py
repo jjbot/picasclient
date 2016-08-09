@@ -221,6 +221,7 @@ class CouchDB(object):
     def set_users(self, admins=None, members=None, admin_roles=None,
                   member_roles=None):
         security = self.db.resource.get_json("_security")[2]
+     
         def try_set(value, d, key, subkey):
             if value is not None:
                 try:

@@ -66,8 +66,8 @@ def upload_many(files, poolsize=10):
 
 class Downloader(threading.Thread):
 
-    """Threaded SRM download class. Facilitates many simultaneous 
-    connections to the SRM. Use with care: you can easily flood the
+    """Threaded SRM download class. Facilitates many simultaneous
+     connections to the SRM. Use with care: you can easily flood the
     SRM with too many request.
     """
 
@@ -79,7 +79,7 @@ class Downloader(threading.Thread):
         """
         threading.Thread.__init__(self)
         self.q = queue
-        if logger == None:
+        if logger is None:
             self.logger = logging.getLogger('SRM')
         else:
             self.logger = logger
@@ -87,7 +87,7 @@ class Downloader(threading.Thread):
         self.daemon = False
 
     def run(self):
-        """Start the download worker. Starts downloading the first file 
+        """Start the download worker. Starts downloading the first file
         in the queue.
         """
         while not self.q.empty():
@@ -125,7 +125,7 @@ class SRMClient(object):
     def remote_exists(self, loc):
         """Check if a file exists on the remote location.
         @param loc: complete path on the SRM to the file.
-        @return: True when the 
+        @return: True when the file exists.
         """
         sURL = self.srm_host + loc
         cmd = ['srmls', sURL]
@@ -146,7 +146,7 @@ class SRMClient(object):
         @local_file: the file that needs to be copied.
         @param srm_dir: location on the SRM where the file needs to be copied
         to.
-        @param check: whether to check if the local and remote files exist. 
+        @param check: whether to check if the local and remote files exist.
         Default: True
         @return: location of the file on the SRM.
         """

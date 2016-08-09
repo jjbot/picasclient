@@ -65,4 +65,3 @@ class Downloader(threading.Thread):
                 raise EnvironmentError("Download failed.")
             self.q.task_done()
         print("Exiting while loop, thread should close itself...")
-

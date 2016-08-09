@@ -28,14 +28,14 @@ from couchdb import Server
 
 class CouchDBLogger(logging.Handler):
 
-    """Logger class which writes messages to CouchDB in a predefined 
-    format.
+    """Logger class which writes messages to CouchDB in a predefined
+     format.
     """
 
     def __init__(self, url, db):
         """Initiation function.
-        :param url: the url including the port on which the database 
-        is located.
+        :param url: the url including the port on which the database
+         is located.
         :param db: the name of the database.
         """
         logging.Handler.__init__(self)
