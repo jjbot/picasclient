@@ -190,7 +190,8 @@ class CouchDB(object):
                       % (doc.id, doc.rev, str(ex)), file=sys.stderr)
                 result[i] = False
             except Exception as ex:
-                print("Could not delete document {0!s}: {1!s}".format(str(doc), str(ex)), file=sys.stderr)
+                print("Could not delete document {0!s}: {1!s}".
+                      format(str(doc), str(ex)), file=sys.stderr)
                 result[i] = False
 
         return result
