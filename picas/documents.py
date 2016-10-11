@@ -12,7 +12,11 @@ class Document(object):
 
     ''' A CouchDB document '''
 
-    def __init__(self, data={}, base={}):
+    def __init__(self, data=None, base=None):
+        if data is None:
+            data = {}
+        if base is None:
+            base = {}
         if isinstance(data, Document):
             data = data.value
 
@@ -138,7 +142,11 @@ class Document(object):
 
 class User(Document):
     ''' CouchDB user '''
-    def __init__(self, username, password, roles=[], data={}):
+    def __init__(self, username, password, roles=None, data=None):
+        if roles is None:
+            roles = []
+        if data is None:
+            data = {}
         super(User, self).__init__(
             data=data,
             base={
@@ -166,7 +174,9 @@ class Task(Document):
     """Class to manage task modifications with.
     """
 
-    def __init__(self, task={}):
+    def __init__(self, task=None):
+        if task is None:
+            task = {}
         super(Task, self).__init__(task, Task.__BASE)
         if '_id' not in self.doc:
             self.doc['_id'] = 'task_' + uuid4().hex
