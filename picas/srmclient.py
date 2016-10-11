@@ -27,7 +27,7 @@ def download(files, threads=10):
     q.join()
     print("Download work done, joining threads")
     for d in thread_pool:
-        print("Joining: %s" % str(d.ident))
+        print("Joining: {0!s}".format(str(d.ident)))
         d.join(1)
 
 
