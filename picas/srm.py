@@ -167,9 +167,8 @@ class SRMClient(object):
         """
         local_file = path.join(local_dir, path.basename(srm_file))
         srm_url = self.srm_host + srm_file
-        if check:
-            if not self.remote_exists(srm_file):
-                raise EnvironmentError(10, "File not found.", srm_url)
+        if check and not self.remote_exists(srm_file):
+            raise EnvironmentError(10, "File not found.", srm_url)
 
         cmd = ['srmcp', '-2', '-server_mode=passive',
                srm_url, 'file:///' + local_file]

@@ -69,7 +69,7 @@ class CouchDB(object):
         for doc in self.view(view, **view_params):
             try:
                 result.append(self.get(doc.id))
-            except:
+            except ValueError:
                 pass  # doc was already deleted
 
         return result
@@ -136,7 +136,7 @@ class CouchDB(object):
         updated = self.db.update([doc.value for doc in docs])
 
         result = [False] * len(docs)
-        for i in range(len(docs)):
+        for i in enumerate(docs):
             is_added, _id, _rev = updated[i]
             if is_added:
                 docs[i]['_id'] = _id
@@ -185,9 +185,11 @@ class CouchDB(object):
             try:
                 self.delete(doc)
             except ResourceConflict as ex:
-                print("Could not delete document %s (rev %s) "
-                      "due to resource conflict: %s"
-                      % (doc.id, doc.rev, str(ex)), file=sys.stderr)
+                
+                print("Could not delete document {0} (rev {1}) "
+                      "due to resource conflict: {2}".
+                      format(doc.id, doc.rev, str(ex)),
+                      file=sys.stderr)
                 result[i] = False
             except Exception as ex:
                 print("Could not delete document %s: %s"
