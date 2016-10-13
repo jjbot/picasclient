@@ -184,8 +184,7 @@ class CouchDB(object):
         for i, doc in enumerate(docs):
             try:
                 self.delete(doc)
-            except ResourceConflict as ex:
-                
+            except ResourceConflict as ex:     
                 print("Could not delete document {0} (rev {1}) "
                       "due to resource conflict: {2}".
                       format(doc.id, doc.rev, str(ex)),
