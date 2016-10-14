@@ -8,7 +8,7 @@ except ImportError:
 setup(name='PiCaS',
       version='0.2.8',
       description='Python client using CouchDB as a token pool server.',
-      author='Jan Bot,Joris Borgdorff,Maarten Kooyman',
+      author='Jan Bot,Joris Borgdorff',
       author_email='helpdesk@surfsara.nl',
       url='https://github.com/sara-nl/picasclient',
       download_url='https://github.com/sara-nl/picasclient/tarball/0.2.8',
