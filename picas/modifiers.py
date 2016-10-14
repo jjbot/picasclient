@@ -8,6 +8,7 @@
 # Python imports
 import socket
 import time
+from os import environ
 
 
 class TokenModifier(object):
@@ -55,6 +56,12 @@ class BasicTokenModifier(TokenModifier):
             'hostname': socket.gethostname(),
             'lock': int(time.time())
         }
+
+        # try to include glite wms job id if present
+        wms_jobid = environ.get("GLITE_WMS_JOBID")
+        if wms_jobid is not None:
+            lock_content["wms_job_id"] = environ.get("GLITE_WMS_JOBID")
+
         token.update(lock_content)
         return token
 
@@ -68,6 +75,9 @@ class BasicTokenModifier(TokenModifier):
             'hostname': socket.gethostname(),
             'lock': 0
         }
+        if "wms_job_id" in token:
+            del token["wms_job_id"]
+
         token.update(lock_content)
         return token
 
@@ -93,6 +103,8 @@ class BasicTokenModifier(TokenModifier):
         done_content = {
             'done': 0
         }
+        if "wms_job_id" in token:
+            del token["wms_job_id"]
         token.update(done_content)
         return token
 
@@ -128,6 +140,7 @@ class NestedTokenModifier(TokenModifier):
 
     def __init__(self, timeout=86400):
         self.timeout = timeout
+        self.tokenmodifier = BasicTokenModifier()
 
     def _get_token_from_list(self, ref, record):
         token = record
@@ -159,41 +172,35 @@ class NestedTokenModifier(TokenModifier):
 
     def lock(self, ref, record):
         token = self._get_token(ref, record)
-        token['lock'] = int(time.time())
-        token['hostname'] = socket.gethostname()
+        token = self.tokenmodifier.lock(token)
         return self._update_record(ref, record, token)
 
     def unlock(self, ref, record):
         token = self._get_token(ref, record)
-        token['lock'] = 0
+        token = self.tokenmodifier.unlock(token)
         return self._update_record(ref, record, token)
 
     def close(self, ref, record):
         token = self._get_token(ref, record)
-        token['done'] = int(time.time())
+        token = self.tokenmodifier.close(token)
         return self._update_record(ref, record, token)
 
     def unclose(self, ref, record):
         token = self._get_token(ref, record)
-        token['lock'] = 0
-        token['done'] = 0
+        token = self.tokenmodifier.unclose(token)
         return self._update_record(ref, record, token)
 
     def add_output(self, ref, record, output):
         token = self._get_token(ref, record)
-        token['output'].update(output)
+        token = self.tokenmodifier.add_output(token, output)
         return self._update_record(ref, record, token)
 
     def scrub(self, ref, record):
         token = self._get_token(ref, record)
-        token['hostname'] = ""
-        token['lock'] = 0
-        token['done'] = 0
-        token['scrub_count'] += 1
+        token = self.tokenmodifier.scrub(token)
         return self._update_record(ref, record, token)
 
     def set_error(self, ref, record):
         token = self._get_token(ref, record)
-        token['lock'] = -1
-        token['done'] = -1
+        token = self.tokenmodifier.set_error(token)
         return self._update_record(ref, record, token)
