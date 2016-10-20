@@ -10,7 +10,7 @@ import threading
 import logging
 import Queue
 
-from PiCaS import SRMClient
+from picas import SRMClient
 
 
 def download(files, threads=10):
