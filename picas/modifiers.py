@@ -8,8 +8,7 @@
 # Python imports
 import socket
 import time
-import batchid
-
+from . import batchid
 
 class TokenModifier(object):
 

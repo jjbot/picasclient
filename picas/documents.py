@@ -4,7 +4,7 @@ import mimetypes
 import base64
 import traceback
 from uuid import uuid4
-import batchid
+from . import batchid
 
 ''' @author Joris Borgdorff '''
 
