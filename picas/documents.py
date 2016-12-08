@@ -4,6 +4,7 @@ import mimetypes
 import base64
 import traceback
 from uuid import uuid4
+import batchid
 
 ''' @author Joris Borgdorff '''
 
@@ -185,6 +186,7 @@ class Task(Document):
         """Function which modifies the task such that it is locked.
         """
         self.doc['lock'] = seconds()
+        batchid.add_batch_management_id(self.doc)
         return self._update_hostname()
 
     def done(self):
@@ -233,6 +235,7 @@ class Task(Document):
         self.doc['scrub_count'] += 1
         self.doc['done'] = 0
         self.doc['lock'] = 0
+        batchid.remove_batch_management_id(self.doc)
         return self._update_hostname()
 
     def error(self, msg=None, exception=None):

@@ -8,7 +8,7 @@
 # Python imports
 import socket
 import time
-from os import environ
+import batchid
 
 
 class TokenModifier(object):
@@ -58,9 +58,7 @@ class BasicTokenModifier(TokenModifier):
         }
 
         # try to include glite wms job id if present
-        wms_jobid = environ.get("GLITE_WMS_JOBID")
-        if wms_jobid is not None:
-            lock_content["wms_job_id"] = environ.get("GLITE_WMS_JOBID")
+        batchid.add_batch_management_id(token)
 
         token.update(lock_content)
         return token
@@ -75,8 +73,7 @@ class BasicTokenModifier(TokenModifier):
             'hostname': socket.gethostname(),
             'lock': 0
         }
-        if "wms_job_id" in token:
-            del token["wms_job_id"]
+        batchid.remove_batch_management_id(token)
 
         token.update(lock_content)
         return token
@@ -103,9 +100,8 @@ class BasicTokenModifier(TokenModifier):
         done_content = {
             'done': 0
         }
-        if "wms_job_id" in token:
-            del token["wms_job_id"]
         token.update(done_content)
+        batchid.remove_batch_management_id(token)
         return token
 
     def add_output(self, token, output):
