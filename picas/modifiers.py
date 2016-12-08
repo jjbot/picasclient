@@ -10,6 +10,7 @@ import socket
 import time
 from . import batchid
 
+
 class TokenModifier(object):
 
     def __init__(self, timeout=86400):

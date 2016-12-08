@@ -66,4 +66,3 @@ class CouchDBLogger(logging.Handler):
 default_log_formatter = logging.Formatter(
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
-
