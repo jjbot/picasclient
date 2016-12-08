@@ -63,6 +63,7 @@ class CouchDBLogger(logging.Handler):
                 count += 1
                 time.sleep(0.5)
 
+                
 default_log_formatter = logging.Formatter(
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
