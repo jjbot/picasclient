@@ -31,7 +31,7 @@ class ViewIterator(object):
     def is_stopped(self):
         return self._stop
 
-    def next(self):
+    def __next__(self):
         return self.__next__()
 
     def __next__(self):
@@ -152,7 +152,7 @@ class EndlessViewIterator(ViewIterator):
     def __next__(self):
         while not self.is_cancelled():
             try:
-                return self.iterator.next()
+                return next(self.iterator)
             except StopIteration:
                 self.iterator.reset()
                 time.sleep(self.sleep_sec)

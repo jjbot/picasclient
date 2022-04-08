@@ -6,7 +6,7 @@
 @author: Jan Bot
 @author: Joris Borgdorff
 """
-from __future__ import print_function
+
 from .documents import Document
 import random
 import sys

@@ -4,7 +4,7 @@
 @licence: The MIT License (MIT)
 @Copyright (c) 2016, Jan Bot
 """
-from __future__ import print_function
+
 
 # Python imports
 import logging

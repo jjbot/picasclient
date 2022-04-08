@@ -4,18 +4,18 @@
 @licence: The MIT License (MIT)
 @Copyright (c) 2016, Jan Bot
 """
-from __future__ import print_function
+
 
 import threading
 import logging
-import Queue
+import queue
 
 from picas import SRMClient
 
 
 def download(files, threads=10):
-    q = Queue.Queue()
-    for k, v in files.iteritems():
+    q = queue.Queue()
+    for k, v in files.items():
         q.put(v)
 
     thread_pool = []

@@ -4,12 +4,12 @@
 @licence: The MIT License (MIT)
 @Copyright (c) 2016, Jan Bot
 """
-from __future__ import print_function
+
 
 # Python imports
 import threading
 import logging
-import Queue
+import queue
 from os import path
 
 from .executers import execute, execute_old
@@ -34,7 +34,7 @@ def download_many(files, poolsize=10, logger=None):
     be established. Default: 10.
     @param logger: a Python logger object. Default: None.
     """
-    q = Queue.Queue()
+    q = queue.Queue()
     for v in files:
         q.put(v)
 
