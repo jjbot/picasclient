@@ -31,7 +31,7 @@ class ViewIterator(object):
     def is_stopped(self):
         return self._stop
 
-    def __next__(self):
+    def next(self):
         return self.__next__()
 
     def __next__(self):
